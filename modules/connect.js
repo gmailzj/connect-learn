@@ -17,6 +17,8 @@ var debug = require('debug')('connect:dispatcher');
 var EventEmitter = require('events').EventEmitter;
 var finalhandler = require('finalhandler');
 var http = require('http');
+
+// 简单的遍历赋值合并 function(a, b)  a[n] = b[n]
 var merge = require('utils-merge');
 var parseUrl = require('parseurl');
 
@@ -32,10 +34,14 @@ module.exports = createServer;
  * @private
  */
 
-var env = process.env.NODE_ENV || 'development';
+var env = process.env.NODE_ENV || 'development'; // 默认环境，在启动程序的时候可以配置NODE_ENV
 var proto = {};
 
 /* istanbul ignore next */
+/** 延迟处理函数 
+ * 比如调用: defer(function(x){},3)
+ * 参数x=3
+ */
 var defer = typeof setImmediate === 'function' ?
     setImmediate :
     function(fn) { process.nextTick(fn.bind.apply(fn, arguments)) }
@@ -47,11 +53,18 @@ var defer = typeof setImmediate === 'function' ?
  * @public
  */
 
-function createServer() {
+function createServer() { // 出口
     function app(req, res, next) { app.handle(req, res, next); }
+    // proto主要实现的是下面定义的 use、handle、listen
     merge(app, proto);
+
+    // 添加EventEmitter的原型方法给app
+    // domain,_events,_maxListeners,setMaxListeners,getMaxListeners,emit,addListener,on,prependListener,
+    // once,prependOnceListener,removeListener,removeAllListeners,listeners,listenerCount,eventNames
     merge(app, EventEmitter.prototype);
+
     app.route = '/';
+
     app.stack = [];
     return app;
 }
@@ -78,7 +91,7 @@ proto.use = function use(route, fn) {
     var path = route;
 
     // default route to '/'
-    if (typeof route !== 'string') {
+    if (typeof route !== 'string') { // 如果第一个参数不是字符串，一般就是function(req, res, next) {}
         handle = route;
         path = '/';
     }
@@ -97,7 +110,7 @@ proto.use = function use(route, fn) {
         handle = handle.listeners('request')[0];
     }
 
-    // strip trailing slash
+    // strip trailing slash 去掉末尾斜杠
     if (path[path.length - 1] === '/') {
         path = path.slice(0, -1);
     }
@@ -117,6 +130,7 @@ proto.use = function use(route, fn) {
  */
 
 proto.handle = function handle(req, res, out) {
+    console.log('handle')
     var index = 0;
     var protohost = getProtohost(req.url) || '';
     var removed = '';
