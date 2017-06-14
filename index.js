@@ -6,20 +6,20 @@ var app = connect();
 
 // gzip/deflate outgoing responses
 var compression = require('compression');
-app.use(compression());
+// app.use(compression());
 
 // store session state in browser cookie
 var cookieSession = require('cookie-session');
-app.use(cookieSession({
-    keys: ['secret1', 'secret2']
-}));
+// app.use(cookieSession({
+//     keys: ['secret1', 'secret2']
+// }));
 
 // parse urlencoded request bodies into req.body
 var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.urlencoded({ extended: false }));
 
 // respond to all requests
-app.use(function(req, res, next) {
+app.use(function middleware_all(req, res, next) {
     //res.end('Hello from Connect!\n');
     next();
 });
@@ -28,16 +28,18 @@ app.use(function(req, res, next) {
 app.use(function middleware1(req, res, next) {
     // middleware 1 打印当前时间戳
     console.log(Date.now())
+    console.log(1)
     next();
 });
 app.use(function middleware2(req, res, next) {
-    // middleware 2  设置httpHeader
+    console.log(2)
+        // middleware 2  设置httpHeader
     res.setHeader('ver', '1.0.0');
     next();
 });
 
 // 注意这里要双斜杠才是首页
-app.use('//', function(req, res, next) {
+app.use('//', function indexMiddleware(req, res, next) {
     res.end("index");
 });
 
@@ -54,7 +56,7 @@ app.use('/bar', function barMiddleware(req, res, next) {
 
 // 如果上面的路由都没有匹配到，说明出错了
 // regular middleware
-app.use(function(req, res, next) {
+app.use(function error404(req, res, next) {
     // i had an error
     next(new Error('error!'));
 });
