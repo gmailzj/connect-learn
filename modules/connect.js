@@ -221,6 +221,8 @@ proto.handle = function handle(req, res, out) {
         call(layer.handle, route, err, req, res, next);
     }
 
+    // 这里是中间件的执行入口，也是中间件循环的关键参数条件，
+    // 循环中的关键参数next又和中间件handle中的next挂钩
     next();
 };
 

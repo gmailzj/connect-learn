@@ -15,8 +15,9 @@ var cookieSession = require('cookie-session');
 // }));
 
 // parse urlencoded request bodies into req.body
+// for parsing application/x-www-form-urlencoded
 var bodyParser = require('body-parser');
-// app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // respond to all requests
 app.use(function middleware_all(req, res, next) {
@@ -45,13 +46,12 @@ app.use('//', function indexMiddleware(req, res, next) {
 
 app.use('/foo', function fooMiddleware(req, res, next) {
     res.end("foo");
-    // next();
 });
 
 app.use('/bar', function barMiddleware(req, res, next) {
     // req.url starts with "/bar"
+    console.log(req.body);
     res.end("bar");
-    // next();
 });
 
 // 如果上面的路由都没有匹配到，说明出错了
@@ -69,22 +69,3 @@ app.use(function onerror(err, req, res, next) {
 });
 //create node.js http server and listen on port
 http.createServer(app).listen(3000);
-
-
-
-// nodejs 创建 对比
-// 请求（require）Node.js 自带的 http 模块，并且把它赋值给 http 变量
-// var http = require('http');
-// http.createServer(function(request, response) {
-
-//     // 发送 HTTP 头部 
-//     // HTTP 状态值: 200 : OK
-//     // 内容类型: text/plain
-//     response.writeHead(200, { 'Content-Type': 'text/plain' });
-
-//     // 发送响应数据 "Hello World"
-//     response.end('Hello World\n');
-// }).listen(8888); // 绑定端口
-
-// // 终端打印如下信息
-// console.log('Server running at http://127.0.0.1:8888/');
